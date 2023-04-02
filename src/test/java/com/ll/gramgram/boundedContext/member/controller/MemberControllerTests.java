@@ -1,15 +1,20 @@
 package com.ll.gramgram.boundedContext.member.controller;
 
+
+import com.ll.gramgram.boundedContext.member.entity.Member;
+import com.ll.gramgram.boundedContext.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -24,6 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class MemberControllerTests {
     @Autowired
     private MockMvc mvc;
+    @Autowired
+    private MemberService memberService;
 
     @Test
     @DisplayName("회원가입 폼")
@@ -50,6 +57,7 @@ public class MemberControllerTests {
     }
 
     @Test
+    // @Rollback(value = false) // DB에 흔적이 남는다.
     @DisplayName("회원가입")
     void t002() throws Exception {
         // WHEN
@@ -66,13 +74,16 @@ public class MemberControllerTests {
                 .andExpect(handler().handlerType(MemberController.class))
                 .andExpect(handler().methodName("join"))
                 .andExpect(status().is3xxRedirection());
+
+        Member member = memberService.findByUsername("user10").orElse(null);
+
+        assertThat(member).isNotNull();
     }
 
-
     @Test
-    @DisplayName("회원가입시에 올바른 데이터를 넘기지 않으면 400에러")
+    @DisplayName("회원가입시에 올바른 데이터를 넘기지 않으면 400")
     void t003() throws Exception {
-        // WHEN // 아이디만 생성할 때
+        // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/member/join")
                         .with(csrf()) // CSRF 키 생성
@@ -86,7 +97,7 @@ public class MemberControllerTests {
                 .andExpect(handler().methodName("join"))
                 .andExpect(status().is4xxClientError());
 
-        //패스워드만 삽입할 때
+        // WHEN
         resultActions = mvc
                 .perform(post("/member/join")
                         .with(csrf()) // CSRF 키 생성
@@ -94,12 +105,13 @@ public class MemberControllerTests {
                 )
                 .andDo(print());
 
+        // THEN
         resultActions
                 .andExpect(handler().handlerType(MemberController.class))
                 .andExpect(handler().methodName("join"))
                 .andExpect(status().is4xxClientError());
 
-        //엉뚱한값(30초과)를 넣었을 때 - username
+        // WHEN
         resultActions = mvc
                 .perform(post("/member/join")
                         .with(csrf()) // CSRF 키 생성
@@ -108,24 +120,25 @@ public class MemberControllerTests {
                 )
                 .andDo(print());
 
+        // THEN
         resultActions
                 .andExpect(handler().handlerType(MemberController.class))
                 .andExpect(handler().methodName("join"))
                 .andExpect(status().is4xxClientError());
 
-        //엉뚱한값(30초과)를 넣었을 때 - password
+        // WHEN
         resultActions = mvc
                 .perform(post("/member/join")
                         .with(csrf()) // CSRF 키 생성
                         .param("username", "user10")
-                        .param("password", "password" + "a".repeat(30))
+                        .param("password", "1234" + "a".repeat(30))
                 )
                 .andDo(print());
 
+        // THEN
         resultActions
                 .andExpect(handler().handlerType(MemberController.class))
                 .andExpect(handler().methodName("join"))
                 .andExpect(status().is4xxClientError());
-
     }
 }
