@@ -1,6 +1,5 @@
 package com.ll.gramgram.boundedContext.member.controller;
 
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,5 +66,66 @@ public class MemberControllerTests {
                 .andExpect(handler().handlerType(MemberController.class))
                 .andExpect(handler().methodName("join"))
                 .andExpect(status().is3xxRedirection());
+    }
+
+
+    @Test
+    @DisplayName("회원가입시에 올바른 데이터를 넘기지 않으면 400에러")
+    void t003() throws Exception {
+        // WHEN // 아이디만 생성할 때
+        ResultActions resultActions = mvc
+                .perform(post("/member/join")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "user10")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(MemberController.class))
+                .andExpect(handler().methodName("join"))
+                .andExpect(status().is4xxClientError());
+
+        //패스워드만 삽입할 때
+        resultActions = mvc
+                .perform(post("/member/join")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("password", "1234")
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(MemberController.class))
+                .andExpect(handler().methodName("join"))
+                .andExpect(status().is4xxClientError());
+
+        //엉뚱한값(30초과)를 넣었을 때 - username
+        resultActions = mvc
+                .perform(post("/member/join")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "user10" + "a".repeat(30))
+                        .param("password", "1234")
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(MemberController.class))
+                .andExpect(handler().methodName("join"))
+                .andExpect(status().is4xxClientError());
+
+        //엉뚱한값(30초과)를 넣었을 때 - password
+        resultActions = mvc
+                .perform(post("/member/join")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "user10")
+                        .param("password", "password" + "a".repeat(30))
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(MemberController.class))
+                .andExpect(handler().methodName("join"))
+                .andExpect(status().is4xxClientError());
+
     }
 }
