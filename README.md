@@ -4,6 +4,7 @@
     - [x] 폼이 있어야 한다.
     - [x] input[name="username"]필드가 있어야 한다
     - [x] input[name="password"]필드가 있어야 한다
+    - [x] 폼 체크
 
 
 - [] 회원가입 폼 처리
