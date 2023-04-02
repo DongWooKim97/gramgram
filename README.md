@@ -1,9 +1,9 @@
 # To-Do List
 
-- [] 회원가입
-    - [] 폼이 있어야 한다.
-    - [] input[name="username"]필드가 있어야 한다
-    - [] input[name="password"]필드가 있어야 한다
+- [x] 회원가입
+    - [x] 폼이 있어야 한다.
+    - [x] input[name="username"]필드가 있어야 한다
+    - [x] input[name="password"]필드가 있어야 한다
 
 
 - [] 회원가입 폼 처리
