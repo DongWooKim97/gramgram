@@ -1,3 +1,3 @@
-DROP DATABASE IF EXISTS gram__dev;
-CREATE DATABASE gram__dev;
-USE gram__dev;
+DROP DATABASE IF EXISTS gram__my;
+CREATE DATABASE gram__my;
+USE gram__my;
