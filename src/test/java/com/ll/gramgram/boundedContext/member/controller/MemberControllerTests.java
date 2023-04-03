@@ -3,14 +3,18 @@ package com.ll.gramgram.boundedContext.member.controller;
 
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.service.MemberService;
+import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -148,7 +152,7 @@ public class MemberControllerTests {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(get("/member/login"))
-                .andDo(print()); // 크게 의미 없고, 그냥 확인용
+                .andDo(print());
 
         // THEN
         resultActions
@@ -167,22 +171,29 @@ public class MemberControllerTests {
     }
 
     @Test
+    // @Rollback(value = false) // DB에 흔적이 남는다.
     @DisplayName("로그인 처리")
     void t005() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
-                .perform(post("/member/join")
+                .perform(post("/member/login")
                         .with(csrf()) // CSRF 키 생성
-                        .param("username", "user10")
+                        .param("username", "user1")
                         .param("password", "1234")
                 )
                 .andDo(print());
 
-        // THEN
+        // 세션에 접근해서 user 객체를 가져온다.
+        MvcResult mvcResult = resultActions.andReturn();
+        HttpSession session = mvcResult.getRequest().getSession(false);// 원래 getSession 을 하면, 만약에 없을 경우에 만들어서라도 준다., false 는 없으면 만들지 말라는 뜻
+        SecurityContext securityContext = (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
+        User user = (User) securityContext.getAuthentication().getPrincipal();
+
+        assertThat(user.getUsername()).isEqualTo("user1");
 
         // THEN
         resultActions
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
+                .andExpect(redirectedUrlPattern("/**"));
     }
 }
