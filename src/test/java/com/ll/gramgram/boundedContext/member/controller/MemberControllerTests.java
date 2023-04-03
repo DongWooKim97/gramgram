@@ -165,4 +165,24 @@ public class MemberControllerTests {
                         <input type="submit" value="로그인"
                         """.stripIndent().trim())));
     }
+
+    @Test
+    @DisplayName("로그인 처리")
+    void t005() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/member/join")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "user10")
+                        .param("password", "1234")
+                )
+                .andDo(print());
+
+        // THEN
+
+        // THEN
+        resultActions
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
+    }
 }
