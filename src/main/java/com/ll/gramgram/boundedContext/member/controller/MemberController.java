@@ -2,6 +2,7 @@ package com.ll.gramgram.boundedContext.member.controller;
 
 import com.ll.gramgram.boundedContext.member.service.MemberService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -21,9 +22,24 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @PreAuthorize("isAnonymous()")
     @GetMapping("/join")
     public String showJoin() {
         return "usr/member/join";
+    }
+
+    @PreAuthorize("isAnonymous()")
+    @PostMapping("/join")
+    public String join(@Valid JoinForm joinForm) {
+        memberService.join(joinForm.getUsername(), joinForm.getPassword());
+
+        return "redirect:/";
+    }
+
+    @PreAuthorize("isAnonymous()")
+    @GetMapping("/login")
+    public String showLogin() {
+        return "usr/member/login";
     }
 
     @Getter
@@ -37,17 +53,5 @@ public class MemberController {
         @NotBlank
         @Size(min = 4, max = 30)
         private final String password;
-    }
-
-    @PostMapping("/join")
-    public String join(@Valid JoinForm joinForm) {
-        memberService.join(joinForm.getUsername(), joinForm.getPassword());
-
-        return "redirect:/";
-    }
-
-    @GetMapping("/login")
-    public String showLogin() {
-        return "usr/member/login";
     }
 }

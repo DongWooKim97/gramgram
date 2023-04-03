@@ -3,14 +3,14 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
-    <link rel="stylesheet" href="https://jhs512.github.io/toastr/toastr.css">
+    <link href="https://jhs512.github.io/toastr/toastr.css" rel="stylesheet">
 
     <script>
     toastr.options = {
@@ -40,6 +40,17 @@
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
     </script>
 
     <style>
@@ -56,6 +67,8 @@
     }
 
 
+
+
     </style>
 
 </head>
@@ -64,6 +77,14 @@
 
 <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.5/dist/full.css" rel="stylesheet" type="text/css"/>
 <script src="https://cdn.tailwindcss.com"></script>
+
+<header>
+    <a class="btn btn-link" href="/member/login" sec:authorize="isAnonymous()">로그인</a>
+    <a class="btn btn-link" href="/member/join" sec:authorize="isAnonymous()">회원가입</a>
+    <a class="btn btn-link" href="javascript:;" onclick="$(this).next().submit();" sec:authorize="isAuthenticated()">로그아웃</a>
+    <form method="POST" th:action="|/member/logout|"></form>
+</header>
+
 
 <main layout:fragment="main"></main>
 
