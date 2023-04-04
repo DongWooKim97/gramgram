@@ -4,6 +4,8 @@ package com.ll.gramgram.boundedContext.member.controller;
 import com.ll.gramgram.boundedContext.instaMember.controller.InstaMemberController;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
+import com.ll.gramgram.boundedContext.member.entity.Member;
+import com.ll.gramgram.boundedContext.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +33,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class InstaMemberControllerTests {
     @Autowired
     private MockMvc mvc;
+
     @Autowired
     private InstaMemberService instaMemberService;
+
+    @Autowired
+    private MemberService memberService;
 
     @Test
     @DisplayName("인스타회원 정보 입력 폼")
@@ -99,8 +105,38 @@ public class InstaMemberControllerTests {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("/pop**"));
 
+
         InstaMember instaMember = instaMemberService.findByUsername("abc123").orElse(null);
 
-        assertThat(instaMember).isNotNull();
+        Member member = memberService.findByUsername("user1").orElseThrow();
+
+        assertThat(member.getInstaMember()).isEqualTo(instaMember);
+    }
+
+    @Test
+    @Rollback(false)
+    @DisplayName("인스타회원 정보 입력 폼 처리")
+    @WithUserDetails("user2")
+    void t004() throws Exception {
+        //test 2 -- mine
+        ResultActions resultActions2 = mvc
+                .perform(post("/instaMember/connect")
+                        .with(csrf())
+                        .param("username", "qwer1234")
+                        .param("gender", "M")
+                )
+                .andDo(print());
+
+        resultActions2
+                .andExpect(handler().handlerType(InstaMemberController.class))
+                .andExpect(handler().methodName("connect"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("/pop**"));
+
+        InstaMember instaMember2 = instaMemberService.findByUsername("qwer1234").orElse(null);
+
+        Member member2 = memberService.findByUsername("user2").orElseThrow();
+
+        assertThat(member2.getInstaMember()).isEqualTo(instaMember2);
     }
 }
