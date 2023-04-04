@@ -5,12 +5,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/likablePerson")
+@RequestMapping("/likeablePerson")
 public class LikeablePersonController {
 
     @GetMapping("/add")
     public String showAdd() {
-        return "usr/likablePerson/add";
+        return "usr/likeablePerson/add";
     }
 
 
