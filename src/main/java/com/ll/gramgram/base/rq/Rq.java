@@ -88,7 +88,7 @@ public class Rq {
         return Ut.url.modifyQueryParam(url, "msg", msgWithTtl(msg));
     }
 
-    private String  msgWithTtl(String msg) {
+    private String msgWithTtl(String msg) {
         return Ut.url.encode(msg) + ";ttl=" + new Date().getTime();
     }
 }

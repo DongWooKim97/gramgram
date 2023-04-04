@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 @RequestMapping("/adm")
 public class AdmHomeController {
-     
+
     @GetMapping("")
     @PreAuthorize("hasAuthority('admin')")
     public String showMain() {
