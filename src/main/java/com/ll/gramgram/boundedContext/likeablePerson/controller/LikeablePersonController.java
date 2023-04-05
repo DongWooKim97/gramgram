@@ -1,9 +1,9 @@
-package com.ll.gramgram.boundedContext.likeablePersone.controller;
+package com.ll.gramgram.boundedContext.likeablePerson.controller;
 
 import com.ll.gramgram.base.rq.Rq;
 import com.ll.gramgram.base.rsData.RsData;
-import com.ll.gramgram.boundedContext.likeablePersone.entity.LikeablePerson;
-import com.ll.gramgram.boundedContext.likeablePersone.service.LikeablePersonService;
+import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
+import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,21 +25,21 @@ public class LikeablePersonController {
         return "usr/likeablePerson/add";
     }
 
-    @PostMapping("add")
-    public String add(@Valid AddForm addForm) {
-        String username = addForm.getUsername();
-
-        RsData<LikeablePerson> createRsData = likeablePersonService.create(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
-        if (createRsData.isFail()) {
-            return rq.historyBack(createRsData);
-        }
-        return rq.redirectWithMsg("/likeablePerson/list", "입력하신 인스타 사용자(%s)를 호감상대로 등록했습니다.");
-    }
-
     @AllArgsConstructor
     @Getter
     public static class AddForm {
         private final String username;
         private final int attractiveTypeCode;
+    }
+
+    @PostMapping("/add")
+    public String add(@Valid AddForm addForm) {
+        RsData<LikeablePerson> createRsData = likeablePersonService.create(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
+
+        if (createRsData.isFail()) {
+            return rq.historyBack(createRsData);
+        }
+
+        return rq.redirectWithMsg("/likeablePerson/list", createRsData);
     }
 }
